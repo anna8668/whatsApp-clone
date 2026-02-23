@@ -1,3 +1,6 @@
+// 🔥 Socket connection (backend URL)
+const socket = io("https://whatsapp-clone-w1bu.onrender.com");
+
 document.addEventListener("DOMContentLoaded", () => {
 
   console.log("App JS Loaded");
@@ -6,29 +9,29 @@ document.addEventListener("DOMContentLoaded", () => {
   const messageInput = document.getElementById("messageInput");
   const receiverInput = document.getElementById("receiverInput");
 
-  console.log("Send button element:", sendBtn);
-
   if (!sendBtn) {
     console.error("sendBtn not found");
     return;
   }
 
-  sendBtn.addEventListener("click", async () => {
+  // ✅ RECEIVE MESSAGE LISTENER (VERY IMPORTANT)
+  socket.on("receive_message", (data) => {
+    console.log("Message received:", data);
 
-    console.log("Send button clicked");
+    // yaha decrypted message show karna hoga
+    // abhi simple display kar rahe hain
+    displayMessage(data.sender, data.message || "Encrypted message received");
+  });
+
+  sendBtn.addEventListener("click", async () => {
 
     const message = messageInput.value.trim();
     const receiver = receiverInput.value.trim();
     const sender = localStorage.getItem("username");
 
-    if (!message || !receiver) {
-      console.log("Message or receiver missing");
-      return;
-    }
+    if (!message || !receiver) return;
 
     socket.emit("get_public_key", receiver, async (publicKey) => {
-
-      console.log("Public key received:", publicKey);
 
       if (!publicKey) {
         alert("User not found");
@@ -36,25 +39,15 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       try {
-        // Import receiver's public key
         const receiverKey = await importPublicKey(publicKey);
-
-        // Generate AES session key
         const aesKey = await generateAESKey();
-
-        // Encrypt message using AES
         const { cipher, iv } = await encryptMessage(message, aesKey);
-
-        // Encrypt AES key using receiver's RSA public key
         const encryptedAESKey = await encryptAESKey(aesKey, receiverKey);
 
-        // Show own message immediately
+        // ✅ Show own message immediately
         displayMessage(sender, message);
-
-        // Clear input
         messageInput.value = "";
 
-        // Send encrypted data to server
         socket.emit("send_message", {
           sender,
           receiver,
@@ -72,16 +65,15 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
 });
+
+// ✅ Message display function
 function displayMessage(sender, message) {
   const chatBox = document.getElementById("chatBox");
 
   const msg = document.createElement("div");
   msg.textContent = sender + ": " + message;
-
   msg.style.margin = "8px 0";
 
   chatBox.appendChild(msg);
-
-  // Auto scroll to bottom
   chatBox.scrollTop = chatBox.scrollHeight;
 }
