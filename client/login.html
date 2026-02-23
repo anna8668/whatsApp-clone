@@ -4,10 +4,15 @@
   <title>Login</title>
 </head>
 <body>
-  <h2>Login</h2>
-  <input type="text" id="username" placeholder="Enter username" />
+
+  <input type="text" id="username" placeholder="Enter username">
   <button onclick="login()">Login</button>
 
+  <!-- Socket.io first -->
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
+  <!-- Then your auth.js -->
   <script src="js/auth.js"></script>
+
 </body>
 </html>
