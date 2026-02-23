@@ -16,12 +16,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ✅ RECEIVE MESSAGE LISTENER (VERY IMPORTANT)
   socket.on("receive_message", (data) => {
-    console.log("Message received:", data);
 
-    // yaha decrypted message show karna hoga
-    // abhi simple display kar rahe hain
-    displayMessage(data.sender, data.message || "Encrypted message received");
-  });
+  const currentUser = localStorage.getItem("username");
+
+  // Agar message maine khud bheja hai, ignore karo
+  if (data.sender === currentUser) return;
+
+  displayMessage(data.sender, "🔐 Encrypted message received");
+});
 
   sendBtn.addEventListener("click", async () => {
 
