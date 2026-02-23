@@ -24,7 +24,7 @@ app.use("/messages", require("./routes/messages"));
 
 require("./socket")(io);
 
-const PORT = 5001;
+const PORT = process.env.PORT || 5001;
 app.get("/", (req, res) => {
   res.send("Backend is running 🚀");
 });
