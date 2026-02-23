@@ -17,23 +17,23 @@ async function login() {
     ["encrypt", "decrypt"]
   );
 
-  // Export keys
   const publicKey = await window.crypto.subtle.exportKey("spki", keyPair.publicKey);
   const privateKey = await window.crypto.subtle.exportKey("pkcs8", keyPair.privateKey);
 
-  // Convert to Base64
   const publicKeyBase64 = btoa(String.fromCharCode(...new Uint8Array(publicKey)));
   const privateKeyBase64 = btoa(String.fromCharCode(...new Uint8Array(privateKey)));
 
-  // Save private key locally
   localStorage.setItem("username", username);
   localStorage.setItem("privateKey", privateKeyBase64);
 
-  // 🔥 Send public key to server
+  // ✅ Wait for server acknowledgement
   socket.emit("register_user", {
     username,
     publicKey: publicKeyBase64
   });
 
-  window.location.href = "index.html";
+  // Small delay to ensure emit completes
+  setTimeout(() => {
+    window.location.href = "/";
+  }, 500);
 }
