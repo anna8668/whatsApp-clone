@@ -5,7 +5,7 @@ const socketIo = require("socket.io");
 const cors = require("cors");
 
 const app = express();
-app.use(cors());   // 👈 THIS FIXES YOUR ERROR
+app.use(cors());
 
 const server = http.createServer(app);
 
@@ -16,7 +16,10 @@ const io = socketIo(server, {
   }
 });
 
-mongoose.connect("mongodb://127.0.0.1:27017/whatsapp-clone")
+require("dotenv").config();
+
+// ✅ Correct MongoDB Connection
+mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB Connected"))
   .catch(err => console.log("❌ MongoDB Error:", err));
 
@@ -25,9 +28,11 @@ app.use("/messages", require("./routes/messages"));
 require("./socket")(io);
 
 const PORT = process.env.PORT || 5001;
+
 app.get("/", (req, res) => {
   res.send("Backend is running 🚀");
 });
+
 server.listen(PORT, () => {
   console.log("🚀 Server running on port " + PORT);
 });
