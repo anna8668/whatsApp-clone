@@ -1,32 +1,29 @@
 const socket = io("https://whatsapp-clone-w1bu.onrender.com");
+
 socket.on("connect", () => {
   console.log("Connected:", socket.id);
 });
 
-// Register user after ensuring username exists
-async function registerUser() {
+// 🔥 Register user using already stored public key
+function registerUser() {
   const username = localStorage.getItem("username");
-  if (!username) return;
+  const privateKey = localStorage.getItem("privateKey");
 
-  await generateRSAKeys();
-  const publicKey = await exportPublicKey();
+  if (!username || !privateKey) return;
 
-  socket.emit("register_user", {
-    username,
-    publicKey
-  });
+  // Public key already saved in DB at login
+  // No need to regenerate keys here
 
-  console.log("RSA keys generated & public key sent");
+  console.log("User already registered at login");
 }
 
 registerUser();
 
-// Receive encrypted message
+// 🔐 Receive encrypted message
 socket.on("receive_message", async (data) => {
 
   const currentUser = localStorage.getItem("username");
 
-  // Only decrypt if message is for this user
   if (data.receiver !== currentUser) return;
 
   try {
@@ -35,7 +32,6 @@ socket.on("receive_message", async (data) => {
 
     console.log("Decrypted:", message);
 
-    // Display in chat UI
     displayMessage(data.sender, message);
 
   } catch (err) {

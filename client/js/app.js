@@ -14,16 +14,57 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  // ✅ RECEIVE MESSAGE LISTENER (VERY IMPORTANT)
-  socket.on("receive_message", (data) => {
+  // ✅ RECEIVE & DECRYPT MESSAGE
+  socket.on("receive_message", async (data) => {
 
-  const currentUser = localStorage.getItem("username");
+    const currentUser = localStorage.getItem("username");
 
-  // Agar message maine khud bheja hai, ignore karo
-  if (data.sender === currentUser) return;
+    // Only receiver should decrypt
+    if (data.receiver !== currentUser) return;
 
-  displayMessage(data.sender, "🔐 Encrypted message received");
-});
+    try {
+      // 🔐 Get private key
+      const privateKeyBase64 = localStorage.getItem("privateKey");
+      const privateKeyBuffer = Uint8Array.from(atob(privateKeyBase64), c => c.charCodeAt(0));
+
+      const privateKey = await window.crypto.subtle.importKey(
+        "pkcs8",
+        privateKeyBuffer,
+        {
+          name: "RSA-OAEP",
+          hash: "SHA-256"
+        },
+        true,
+        ["decrypt"]
+      );
+
+      // 🔐 Decrypt AES key
+      const encryptedAESKeyBytes = Uint8Array.from(atob(data.encryptedAESKey), c => c.charCodeAt(0));
+
+      const aesKeyRaw = await window.crypto.subtle.decrypt(
+        { name: "RSA-OAEP" },
+        privateKey,
+        encryptedAESKeyBytes
+      );
+
+      const aesKey = await window.crypto.subtle.importKey(
+        "raw",
+        aesKeyRaw,
+        { name: "AES-GCM" },
+        true,
+        ["decrypt"]
+      );
+
+      // 🔐 Decrypt actual message
+      const decryptedMessage = await decryptMessage(data.cipher, data.iv, aesKey);
+
+      displayMessage(data.sender, decryptedMessage);
+
+    } catch (err) {
+      console.error("Decryption failed:", err);
+    }
+
+  });
 
   sendBtn.addEventListener("click", async () => {
 

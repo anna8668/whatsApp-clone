@@ -27,13 +27,11 @@ async function login() {
   localStorage.setItem("privateKey", privateKeyBase64);
 
   // ✅ Wait for server acknowledgement
-  socket.emit("register_user", {
-    username,
-    publicKey: publicKeyBase64
-  });
-
-  // Small delay to ensure emit completes
-  setTimeout(() => {
-    window.location.href = "/";
-  }, 500);
+socket.emit("register_user", {
+  username,
+  publicKey: publicKeyBase64
+}, () => {
+  // Server confirmed registration
+  window.location.href = "/";
+});
 }
