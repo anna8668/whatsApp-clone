@@ -8,14 +8,17 @@
   <link rel="stylesheet" href="style.css">
 
   <!-- Google Identity Services -->
-<script src="https://accounts.google.com/gsi/client" async defer></script></head>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
 
 <body>
+
+  <!-- Redirect to login if not logged in -->
   <script>
-  if (!localStorage.getItem("username")) {
-    window.location.href = "login.html";
-  }
-</script>
+    if (!localStorage.getItem("username")) {
+      window.location.replace("login.html");
+    }
+  </script>
 
   <div class="chat-container">
 
@@ -27,31 +30,40 @@
     <!-- Input Section -->
     <div class="input-section">
 
-  <input 
-    type="text" 
-    id="receiverInput" 
-    placeholder="Enter receiver username"
-  />
+      <input 
+        type="text" 
+        id="receiverInput" 
+        placeholder="Enter receiver username"
+      />
 
-  <input 
-    type="text" 
-    id="messageInput" 
-    placeholder="Type your message..." 
-    autocomplete="off"
-  />
+      <input 
+        type="text" 
+        id="messageInput" 
+        placeholder="Type your message..." 
+        autocomplete="off"
+      />
 
-  <button id="sendBtn">Send</button>
-  <button onclick="backupToDrive()">Backup</button>
+      <button id="sendBtn">Send</button>
+      <button onclick="backupToDrive()">Backup</button>
 
-</div>
+    </div>
   </div>
 
-  <!-- Socket.io -->
-<script src="https://whatsapp-clone-w1bu.onrender.com/socket.io/socket.io.js"></script><script src="js/app.js"></script>
-<script src="js/drive.js"></script>
-<script>
-  const CLIENT_ID = "17026982031-ltdd31hn8ueajv92bqto5n52mvms9iq6.apps.googleusercontent.com";
-</script>
+  <!-- 🔥 Load Socket.io FIRST -->
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
+  <!-- 🔥 Load crypto BEFORE app.js -->
+  <script src="js/crypto.js"></script>
+
+  <!-- Your main app logic -->
+  <script src="js/app.js"></script>
+
+  <!-- Google Drive backup -->
+  <script src="js/drive.js"></script>
+
+  <script>
+    const CLIENT_ID = "17026982031-ltdd31hn8ueajv92bqto5n52mvms9iq6.apps.googleusercontent.com";
+  </script>
 
 </body>
 </html>
