@@ -1,0 +1,30 @@
+body {
+  font-family: Arial;
+}
+
+.chat-container {
+  width: 400px;
+  margin: auto;
+}
+
+#messages {
+  height: 300px;
+  border: 1px solid #ccc;
+  overflow-y: scroll;
+  margin-bottom: 10px;
+  padding: 10px;
+}
+
+.message {
+  margin: 5px 0;
+}
+
+.me {
+  text-align: right;
+  color: blue;
+}
+
+.other {
+  text-align: left;
+  color: green;
+}

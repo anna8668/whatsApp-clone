@@ -1,0 +1,16 @@
+{
+  "name": "whatsapp-server",
+  "version": "1.0.0",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^16.6.1",
+    "express": "^4.22.1",
+    "mongoose": "^7.8.9",
+    "socket.io": "^4.8.3"
+  }
+}
