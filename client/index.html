@@ -9,7 +9,13 @@
 
   <!-- Google Identity Services -->
 <script src="https://accounts.google.com/gsi/client" async defer></script></head>
+
 <body>
+  <script>
+  if (!localStorage.getItem("username")) {
+    window.location.href = "login.html";
+  }
+</script>
 
   <div class="chat-container">
 

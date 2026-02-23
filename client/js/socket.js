@@ -1,5 +1,4 @@
-const socket = io("http://localhost:5001");
-
+const socket = io("https://whatsapp-clone-w1bu.onrender.com");
 socket.on("connect", () => {
   console.log("Connected:", socket.id);
 });
