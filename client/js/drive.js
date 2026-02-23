@@ -17,7 +17,7 @@ async function backupToDrive() {
   const username = localStorage.getItem("username");
 
   try {
-    const response = await fetch(`http://localhost:5001/messages/${username}`);
+    const response = await fetch("https://whatsapp-clone-w1bu.onrender.com/messages/" + username);
     const messages = await response.json();
 
     console.log("Encrypted messages fetched:", messages);
