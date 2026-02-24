@@ -32,6 +32,6 @@ socket.emit("register_user", {
   publicKey: publicKeyBase64
 }, () => {
   // Server confirmed registration
-  window.location.href = "/";
+  window.location.href = "index.html";
 });
 }
