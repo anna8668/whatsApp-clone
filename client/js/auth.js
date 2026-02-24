@@ -30,8 +30,9 @@ async function login() {
 socket.emit("register_user", {
   username,
   publicKey: publicKeyBase64
-}, () => {
-  // Server confirmed registration
-  window.location.href = "index.html";
 });
+
+setTimeout(() => {
+  window.location.href = "index.html";
+}, 500);
 }
