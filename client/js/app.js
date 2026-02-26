@@ -1,9 +1,17 @@
-// 🔥 Socket connection (backend URL)
+// 🔥 Socket connection
 const socket = io("https://whatsapp-clone-w1bu.onrender.com");
 
 document.addEventListener("DOMContentLoaded", () => {
 
   console.log("App JS Loaded");
+
+  const currentUsername = localStorage.getItem("username");
+
+  // ✅ Tell backend this user is online
+  if (currentUsername) {
+    socket.emit("user_online", currentUsername);
+    console.log("🟢 User online:", currentUsername);
+  }
 
   const sendBtn = document.getElementById("sendBtn");
   const messageInput = document.getElementById("messageInput");
@@ -17,28 +25,20 @@ document.addEventListener("DOMContentLoaded", () => {
   // ✅ RECEIVE & DECRYPT MESSAGE
   socket.on("receive_message", async (data) => {
 
-    const currentUser = localStorage.getItem("username");
-
-    // Only receiver should decrypt
-    if (data.receiver !== currentUser) return;
+    if (data.receiver !== currentUsername) return;
 
     try {
-      // 🔐 Get private key
       const privateKeyBase64 = localStorage.getItem("privateKey");
       const privateKeyBuffer = Uint8Array.from(atob(privateKeyBase64), c => c.charCodeAt(0));
 
       const privateKey = await window.crypto.subtle.importKey(
         "pkcs8",
         privateKeyBuffer,
-        {
-          name: "RSA-OAEP",
-          hash: "SHA-256"
-        },
+        { name: "RSA-OAEP", hash: "SHA-256" },
         true,
         ["decrypt"]
       );
 
-      // 🔐 Decrypt AES key
       const encryptedAESKeyBytes = Uint8Array.from(atob(data.encryptedAESKey), c => c.charCodeAt(0));
 
       const aesKeyRaw = await window.crypto.subtle.decrypt(
@@ -55,7 +55,6 @@ document.addEventListener("DOMContentLoaded", () => {
         ["decrypt"]
       );
 
-      // 🔐 Decrypt actual message
       const decryptedMessage = await decryptMessage(data.cipher, data.iv, aesKey);
 
       displayMessage(data.sender, decryptedMessage);
@@ -66,11 +65,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   });
 
+  // ✅ SEND MESSAGE
   sendBtn.addEventListener("click", async () => {
 
     const message = messageInput.value.trim();
     const receiver = receiverInput.value.trim();
-    const sender = localStorage.getItem("username");
+    const sender = currentUsername;
 
     if (!message || !receiver) return;
 
@@ -87,7 +87,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const { cipher, iv } = await encryptMessage(message, aesKey);
         const encryptedAESKey = await encryptAESKey(aesKey, receiverKey);
 
-        // ✅ Show own message immediately
         displayMessage(sender, message);
         messageInput.value = "";
 
@@ -109,7 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
-// ✅ Message display function
+// ✅ Display message
 function displayMessage(sender, message) {
   const chatBox = document.getElementById("chatBox");
 
